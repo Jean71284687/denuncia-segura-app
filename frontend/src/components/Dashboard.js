@@ -3,23 +3,12 @@ import React, { useState, useEffect } from 'react';
 function Dashboard({ usuarioActual }) {
   const [denuncias, setDenuncias] = useState([]);
 
-useEffect(() => {
+  useEffect(() => {
     // Cuando carga el panel, busca en MySQL las denuncias de este usuario
     fetch(`http://localhost:8080/api/denuncias/usuario/${usuarioActual.id}`)
       .then(res => res.json())
-      .then(data => {
-        // Validamos que 'data' sea realmente una lista/arreglo
-        if (Array.isArray(data)) {
-          setDenuncias(data);
-        } else {
-          console.error("El servidor devolvió un objeto de error en lugar de una lista:", data);
-          setDenuncias([]); // Lo forzamos a ser una lista vacía para evitar que React colapse
-        }
-      })
-      .catch(err => {
-        console.error("Error de conexión al obtener denuncias:", err);
-        setDenuncias([]);
-      });
+      .then(data => setDenuncias(data))
+      .catch(err => console.error(err));
   }, [usuarioActual]);
 
   const styles = { 
