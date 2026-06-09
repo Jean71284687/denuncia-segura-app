@@ -11,18 +11,39 @@ Este proyecto se enmarca en el **ODS 16: Paz, Justicia e Instituciones Sólidas*
 * **Pablo (Asistente Virtual IA)**
 
 ## 🏗️ Arquitectura del Sistema (MVC)
-Este repositorio funciona como un **Monorepo** que contiene tanto el frontend como el backend, estructurados en capas:
-* **Frontend (`/frontend`):** Aplicación Web desarrollada en React (Interfaces y Dashboard en modo oscuro).
-* **Backend (`/backend`):** API REST desarrollada en Spring Boot (Java) con arquitectura Modelo-Vista-Controlador.
-* **Integraciones:**
-  * API RENIEC (Validación de identidad en tiempo real).
-  * NLP / OpenAI (Extracción de entidades desde audios de WhatsApp).
-  * API SIDPOL (Interoperabilidad con los sistemas policiales).
-* **Base de Datos:** MySQL desplegada en AWS RDS.
+Este repositorio funciona como un **Monorepo** estructurado bajo el patrón arquitectónico de N-Capas (Decoupled Layered Architecture) para garantizar un bajo acoplamiento y alta cohesión:
 
-## 📂 Estructura del Repositorio
+* **Frontend (`/frontend`):** Capa de presentación y UI interactiva construida con React.js.
+* **Backend (`/backend`):** Capa lógica y API REST desarrollada en Java con Spring Boot (MVC).
+* **Base de Datos:** RDBMS (MySQL) para garantizar propiedades ACID.
+
+## 📂 Estructura Oficial del Repositorio
+
 ```text
 denuncia-segura-app/
-├── docs/          # Diagramas de arquitectura, wireframes y Cuadro PDCA
-├── frontend/      # Código fuente de la UI (React App)
-└── backend/       # Código fuente de los Controladores, Servicios y Modelos (Spring Boot)
+│
+├── .github/                         # Workflows de integración continua (CI/CD)
+├── docs/                            # Documentación del proyecto
+│   ├── diagramas/                   # Diagramas de arquitectura y Service Blueprint
+│   ├── wireframes/                  # Diseños de interfaz de usuario
+│   └── PDCA/                        # Cuadro integrado de mejora continua (Ciclo Deming)
+│
+├── frontend/                        # Capa de Presentación (React.js)
+│   ├── public/                      
+│   └── src/                         
+│       ├── App.js                   # Contenedor principal y enrutamiento
+│       └── components/              # Vistas modulares
+│           ├── Dashboard.js         # Panel ciudadano y expedientes PDF
+│           ├── Chatbot.js           # Interfaz conversacional / WhatsApp
+│           └── Login.js             # Módulo de identidad blindada (RENIEC)
+│
+├── backend/                         # Capa Lógica y Core (Spring Boot)
+│   └── src/main/java/backend/       
+│       ├── controller/              # Controladores REST (Recepción de peticiones)
+│       ├── model/                   # Entidades de negocio y mapeo ORM
+│       ├── service/                 # Lógica de triaje y reglas de negocio
+│       ├── repository/              # Acceso a datos (Spring Data JPA)
+│       ├── integration/             # Adaptadores externos (RENIEC, SIDPOL, NLP)
+│       └── util/                    # Herramientas auxiliares y generadores de PDF
+│
+└── README.md                        # Documentación principal
