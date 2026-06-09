@@ -1,28 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-function Chatbot() {
-  const styles = {
-    card: { backgroundColor: '#1f2937', borderRadius: '12px', padding: '24px', border: '1px solid #374151' },
-    cardTitle: { fontSize: '18px', fontWeight: 'bold', marginBottom: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' },
-    button: { width: '100%', backgroundColor: '#10b981', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginTop: '16px' },
-    buttonSecondary: { backgroundColor: '#374151', color: '#ffffff', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginTop: '16px', width: '100%' }
+function Chatbot({ usuarioActual, irAlPanel }) {
+  const [relato, setRelato] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const enviarDenuncia = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8080/api/denuncias/registrar/${usuarioActual.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ relatoCiudadano: relato })
+      });
+      
+      if (response.ok) {
+        alert('✅ Denuncia registrada exitosamente en la base de datos PNP.');
+        irAlPanel(); // Redirige al panel principal
+      }
+    } catch (err) {
+      alert('Error de conexión con el servidor.');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const styles = { card: { backgroundColor: '#1f2937', padding: '24px', borderRadius: '12px', border: '1px solid #374151' } };
+
   return (
-    <div style={{ display: 'flex', gap: '24px' }}>
-      <div style={{ ...styles.card, flex: 1, textAlign: 'center' }}>
-        <div style={{ fontSize: '40px', marginBottom: '16px' }}>📱</div>
-        <div style={styles.cardTitle}>Vía WhatsApp (Recomendado)</div>
-        <p style={{ color: '#9ca3af', marginBottom: '24px' }}>Inicia el chatbot interactivo. La Inteligencia Artificial te guiará y extraerá los datos de tu relato por nota de voz en menos de 10 minutos.</p>
-        <button style={{...styles.button, backgroundColor: '#25D366'}}>🟢 Iniciar Chat Automático</button>
-      </div>
+    <div style={styles.card}>
+      <h2 style={{marginTop: 0}}>Redactar Denuncia</h2>
+      <p style={{color: '#9ca3af', marginBottom: '20px'}}>Escriba los detalles de lo sucedido. Nuestra Inteligencia Artificial analizará el texto para extraer el delito y nivel de riesgo.</p>
       
-      <div style={{ ...styles.card, flex: 1, textAlign: 'center' }}>
-        <div style={{ fontSize: '40px', marginBottom: '16px' }}>💻</div>
-        <div style={styles.cardTitle}>Formulario Web</div>
-        <p style={{ color: '#9ca3af', marginBottom: '24px' }}>Completa tu denuncia manualmente a través de nuestro formulario encriptado. Requiere validación activa con RENIEC y firma digital.</p>
-        <button style={styles.buttonSecondary}>Abrir Formulario</button>
-      </div>
+      <form onSubmit={enviarDenuncia}>
+        <textarea 
+          rows="6" 
+          placeholder="Ej: Me robaron el celular en la avenida con un arma..."
+          value={relato}
+          onChange={(e) => setRelato(e.target.value)}
+          required
+          style={{ width: '97%', padding: '12px', borderRadius: '8px', backgroundColor: '#374151', color: 'white', border: '1px solid #4b5563', marginBottom: '16px' }}
+        />
+        <button type="submit" disabled={loading} style={{ backgroundColor: loading ? '#4b5563' : '#10b981', color: 'white', padding: '12px 24px', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+          {loading ? 'Procesando IA...' : '📤 Enviar Denuncia Segura'}
+        </button>
+      </form>
     </div>
   );
 }

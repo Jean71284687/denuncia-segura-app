@@ -3,16 +3,34 @@ import React, { useState } from 'react';
 function Login({ onLogin }) {
   const [dni, setDni] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
     
-    // Simulando el tiempo de respuesta de la API de RENIEC
-    setTimeout(() => {
+    try {
+      // Aquí ocurre la magia: React llama a tu servidor de Spring Boot
+      const response = await fetch(`http://localhost:8080/api/usuarios/validar-reniec?dni=${dni}`, {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        const usuarioData = await response.json();
+        console.log("Datos recibidos del Backend:", usuarioData);
+        
+        // Damos acceso al sistema y le pasamos los datos del ciudadano
+        onLogin(usuarioData); 
+      } else {
+        setError('Error en la validación de RENIEC. Intente nuevamente.');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Error de conexión con el servidor. ¿El backend está encendido?');
+    } finally {
       setLoading(false);
-      onLogin(); // Da acceso al sistema
-    }, 1500);
+    }
   };
 
   return (
@@ -29,11 +47,14 @@ function Login({ onLogin }) {
               placeholder="Ingrese su DNI (8 dígitos)" 
               maxLength="8"
               value={dni}
-              onChange={(e) => setDni(e.target.value.replace(/\D/g, ''))} // Solo acepta números
+              onChange={(e) => setDni(e.target.value.replace(/\D/g, ''))} 
               style={{ width: '93%', padding: '12px', borderRadius: '8px', border: '1px solid #4b5563', backgroundColor: '#374151', color: 'white', fontSize: '16px' }}
               required
             />
           </div>
+          
+          {error && <p style={{ color: '#ef4444', fontSize: '13px', marginBottom: '15px' }}>{error}</p>}
+
           <button type="submit" disabled={loading || dni.length !== 8} style={{ width: '100%', padding: '14px', backgroundColor: (loading || dni.length !== 8) ? '#4b5563' : '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: (loading || dni.length !== 8) ? 'not-allowed' : 'pointer', transition: 'background-color 0.3s' }}>
             {loading ? 'Conectando con RENIEC...' : 'Validar Identidad'}
           </button>

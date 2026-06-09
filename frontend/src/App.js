@@ -4,8 +4,9 @@ import Chatbot from './components/Chatbot';
 import Login from './components/Login';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [usuarioActual, setUsuarioActual] = useState(null);
   const [activeMenu, setActiveMenu] = useState('panel');
+  
 
   const styles = {
     container: { display: 'flex', minHeight: '100vh', backgroundColor: '#111827', color: '#f3f4f6', fontFamily: 'Arial, sans-serif' },
@@ -18,8 +19,8 @@ function App() {
   };
 
   // Si no está autenticado, mostramos la pantalla de RENIEC
-  if (!isAuthenticated) {
-    return <Login onLogin={() => setIsAuthenticated(true)} />;
+  if (!usuarioActual) {
+    return <Login onLogin={(datosDelUsuario) => setUsuarioActual(datosDelUsuario)} />;
   }
 
   // Si ya se validó, mostramos el sistema principal
@@ -32,9 +33,10 @@ function App() {
         <div style={styles.menuItem(activeMenu === 'historial')} onClick={() => setActiveMenu('historial')}>📜 Historial</div>
         
         <div style={{ marginTop: 'auto' }}>
-          <div style={{...styles.menuItem(false), color: '#ef4444'}} onClick={() => setIsAuthenticated(false)}>
-            🚪 Cerrar Sesión
+          <div style={{...styles.menuItem(false), color: '#ef4444'}} onClick={() => setUsuarioActual(null)}>
+             🚪 Cerrar Sesión
           </div>
+          
         </div>
       </div>
 
@@ -45,11 +47,11 @@ function App() {
             {activeMenu === 'nueva' && 'Registrar Nueva Denuncia'}
             {activeMenu === 'historial' && 'Historial de Casos'}
           </h1>
-          <div style={styles.userBadge}>👤 DNI Validado</div>
+          <div style={styles.userBadge}>👤 DNI: {usuarioActual.dni}</div>
         </div>
 
-        {activeMenu === 'panel' && <Dashboard />}
-        {activeMenu === 'nueva' && <Chatbot />}
+        {activeMenu === 'panel' && <Dashboard usuarioActual={usuarioActual} />}
+        {activeMenu === 'nueva' && <Chatbot usuarioActual={usuarioActual} irAlPanel={() => setActiveMenu('panel')} />}
         {activeMenu === 'historial' && <div><p style={{color: '#9ca3af'}}>Historial de denuncias sincronizado con SIDPOL en desarrollo...</p></div>}
       </div>
     </div>
